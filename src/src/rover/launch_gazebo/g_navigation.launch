@@ -1,0 +1,81 @@
+<?xml version = "1.0"?>
+
+<launch>
+
+    <include file="$(find leo_erc_gazebo)/launch/leo_marsyard2021.launch" pass_all_args="true"/>
+    
+    <arg name="marker_size" default="15.0" />
+    <arg name="max_new_marker_error" default="0.08" />
+    <arg name="max_track_error" default="0.2" />
+
+    <!-- Rviz -->
+
+    <arg name="config" default="robot" />
+    <arg name="rviz_file" default="$(find rover)/rviz/$(arg config).rviz"/>
+
+    <node   name="$(anon rviz)" 
+            pkg="rviz"
+            type="rviz"
+            args="-d $(arg rviz_file)"
+            required="true"
+            output="screen"/>
+
+    <!-- AR Track Alvar -->
+
+    <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkersNoKinect" respawn="false" output="screen">
+        <param name="marker_size"           type="double" value="$(arg marker_size)" />
+        <param name="max_new_marker_error"  type="double" value="$(arg max_new_marker_error)" />
+        <param name="max_track_error"       type="double" value="$(arg max_track_error)" />
+        <param name="output_frame"          type="string" value="base_link" />
+
+        <remap from="/camera_image"  to="/zed2/left/image_rect_color" />
+        <remap from="/camera_info"   to="/zed2/left/camera_info" />
+    </node>
+
+    <node name="ar_track_correction" pkg="rover" type="ar_track_data"/> 
+
+    <!-- Robot Localization -->
+
+    <node name="ukf_localization_node"
+        pkg="robot_localization"
+        type="ukf_localization_node"
+        clear_params="true">
+        <rosparam file="$(find rover)/params/localization.yaml"/>
+    </node>
+
+    <!-- Converting Mars Yard to Point Cloud-->
+
+    <node pkg="point_cloud_io" type="read" name="read" output="screen">
+        <param name="file_path" value="$(find rover)/map/MarsYard.ply" />
+        <param name="topic"     value="/point_cloud" />
+        <param name="frame"     value="map" />
+        <param name="rate"      value="1.0" />
+    </node>
+
+    <!-- Depth to Laser Scan Data-->
+
+    <node name="depthimage_to_laserscan" pkg="depthimage_to_laserscan" type="depthimage_to_laserscan" args="">
+
+        <remap from="image"       to="zed2/depth/depth_registered"/> <!-- change here for your camera depth topic name. Default: "/camera/depth/image_raw" -->
+
+        <remap from="camera_info" to="/zed2/depth/camera_info"/> 
+        <param name="scan_height"     type="int"    value="2"/> <!-- default: 1 pixel. Number of pixel rows used to generate laser scan. -->
+        <param name="scan_time"       type="double" value="0.033"/> <!-- default:0.033, 30 FPS . Time between scans. -->
+        <param name="range_min"       type="double" value="0.45"/> <!--default:0.45m. Ranges less than this are considered -Inf. -->
+        <param name="range_max"       type="double" value="10.0"/> <!--default: 10m. Ranges less than this are considered +Inf. -->
+        <param name="output_frame_id" type="str"    value="camera_frame"/> <!--default: camera_depth_frame. Frame id of the laser scan. -->
+        <remap from="scan" to="depth_laser/scan"/>
+    </node>
+
+    <!-- Running AMCL -->
+
+    <node name="amcl"
+        pkg="amcl"
+        type="amcl"
+        clear_params="true">
+    <rosparam command="load" file="$(find rover)/params/amcl.yaml"/>
+        <remap from="scan" to="depth_laser/scan"/>
+        <remap from="map" to="/projected_map"/>
+    </node>
+
+</launch>

@@ -1,0 +1,11 @@
+<launch>
+
+    <node name="camera_save_node" pkg="image_view" type="extract_images" cwd = "node" respawn="false" output="screen">
+        <remap from="image" to="/zed2/left/image_rect_color"/>
+
+        <param name = "filename_format" type = "string" value = "$(find rover)/pictures/image%04d.jpg"/>
+        <param name = "sec_per_frame" type = "double" value = "3"/>
+
+    </node>
+
+</launch>

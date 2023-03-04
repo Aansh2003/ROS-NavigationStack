@@ -1,0 +1,20 @@
+<?xml version = "1.0"?>
+
+<launch>
+    <remap from="map" to="map"/>
+    <remap from="odom" to="odometry/filtered"/>
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+
+        <rosparam file="$(find rover)/params/move_base.yaml" command="load"/>
+
+        <rosparam file="$(find rover)/params/costmaps/common_map.yaml" command="load" ns="global_costmap" /> 
+        <rosparam file="$(find rover)/params/costmaps/common_map.yaml" command="load" ns="local_costmap" />
+        
+        <rosparam file="$(find rover)/params/costmaps/local_map.yaml" command="load" />
+        <rosparam file="$(find rover)/params/costmaps/global_map.yaml" command="load" /> 
+        
+        <rosparam file="$(find rover)/params/planners/local_planner.yaml" command="load" />
+        <rosparam file="$(find rover)/params/planners/global_planner.yaml" command="load"/>
+        
+    </node>
+</launch>

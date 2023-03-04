@@ -1,0 +1,12 @@
+<?xml version = "1.0"?>
+
+<launch>
+    <!-- Running rover on Gazebo -->
+
+    <include file="$(find leo_erc_gazebo)/launch/leo_marsyard2022.launch" pass_all_args="true"/>
+
+    <!-- Vizualising Rover and map on Rviz -->
+
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find rover)/rviz/MarsRoverManipal.rviz" />
+
+</launch>

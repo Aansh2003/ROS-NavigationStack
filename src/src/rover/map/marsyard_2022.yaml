@@ -1,0 +1,7 @@
+image: marsyard_2022.jpeg
+resolution: 0.050000
+origin: [-3.750000, -31.250000, 0]
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.196
+

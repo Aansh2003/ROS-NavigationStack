@@ -1,0 +1,25 @@
+<?xml version = "1.0"?>
+
+<launch>
+
+    <!-- Converting ply file to point cloud data and publishing a map -->
+
+    <include file="$(find rover)/launch/mapping.launch" pass_all_args="true"/>
+
+    <!-- Static transform for only initial pose -->
+
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" args="0 0 0 0 0 0 map odom 1"/>
+
+    <!-- Robot Localization odom -> base_footprint -->
+
+    <include file="$(find rover)/launch/localization.launch" pass_all_args="true"/>
+
+    <!-- Move Base -->
+
+    <include file="$(find rover)/launch/move_base.launch" pass_all_args="true"/>
+
+    <!-- Point Cloud Processing Node -->
+
+    <node name="GPE_node" pkg="rover" type="GPE" respawn="false" output="screen"/>
+
+</launch>
