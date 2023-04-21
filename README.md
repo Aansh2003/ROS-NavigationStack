@@ -1,4 +1,4 @@
-# Mars Rover Manipal - ERC 2022 - Navigation Stack 
+# ERC 2022 - Navigation Stack 
 
 The current version of the simulation targets [ROS Noetic Ninjemys](http://wiki.ros.org/noetic/Installation/) distribution and was mainly developed and tested on [Ubuntu 20.04 Focal Fossa](https://releases.ubuntu.com/20.04/).
  
